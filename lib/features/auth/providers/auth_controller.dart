@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/token_storage.dart';
+import '../../../core/push/push_notifications.dart';
 import '../../../shared/models/user.dart';
 import '../../tracking/data/background_location_service.dart';
 import '../data/auth_repository.dart';
@@ -43,6 +44,7 @@ class AuthController extends AsyncNotifier<User?> {
 
   Future<void> logout() async {
     await BackgroundLocationService.stop();
+    await PushNotifications.unregister();
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(null);
   }

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'core/config/app_config.dart';
+import 'core/push/push_notifications.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/locale_controller.dart';
 import 'core/theme/app_colors.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
   final strings = await AppStrings.load(languageCode);
 
   await BackgroundLocationService.initialize();
+  await PushNotifications.start();
 
   runApp(
     ProviderScope(

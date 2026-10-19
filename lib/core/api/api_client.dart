@@ -65,6 +65,13 @@ class ApiClient {
     );
   }
 
+  Future<void> delete(String path, {Object? data}) async {
+    await _send(
+      () => _dio.delete<Map<String, dynamic>>(path, data: data),
+      (_) => null,
+    );
+  }
+
   Future<ApiEnvelope<T>> patch<T>(
     String path, {
     Object? data,

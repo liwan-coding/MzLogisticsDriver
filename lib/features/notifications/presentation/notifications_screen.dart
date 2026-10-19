@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -12,6 +14,7 @@ import '../../../shared/widgets/page_header.dart';
 import '../../../shared/widgets/pressable_scale.dart';
 import '../data/notifications_repository.dart';
 import '../providers/notifications_providers.dart';
+import '../../../shared/models/app_notification.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -74,14 +77,7 @@ class NotificationsScreen extends ConsumerWidget {
                 return Appear.stagger(
                   index: index,
                   child: PressableScale(
-                    onTap: item.isUnread
-                        ? () async {
-                            await ref
-                                .read(notificationsRepositoryProvider)
-                                .markRead(item.id);
-                            ref.invalidate(notificationsListProvider);
-                          }
-                        : null,
+                    onTap: () => _open(context, ref, item),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.all(16),
@@ -116,9 +112,7 @@ class NotificationsScreen extends ConsumerWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        item.title.isEmpty
-                                            ? strings.t('notifications.title')
-                                            : item.title,
+                                        _title(context, item, strings),
                                         style: AppText.title,
                                       ),
                                     ),
@@ -141,10 +135,10 @@ class NotificationsScreen extends ConsumerWidget {
                                       ),
                                   ],
                                 ),
-                                if (item.body.isNotEmpty) ...[
+                                if (_body(context, item).isNotEmpty) ...[
                                   const SizedBox(height: 6),
                                   Text(
-                                    item.body,
+                                    _body(context, item),
                                   style: AppText.bodyMuted,
                                   ),
                                 ],
@@ -168,5 +162,26 @@ class NotificationsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+String _title(BuildContext context, AppNotification item, AppStrings strings) {
+  final text = item.textTitle(Localizations.localeOf(context).languageCode);
+  return text.isEmpty ? strings.t('notifications.title') : text;
+}
+
+String _body(BuildContext context, AppNotification item) {
+  return item.textBody(Localizations.localeOf(context).languageCode);
+}
+
+Future<void> _open(BuildContext context, WidgetRef ref, AppNotification item) async {
+  final id = item.targetId;
+  final path = item.targetType == 'trip' && id != null ? '/trips/$id' : null;
+  if (item.isUnread) {
+    await ref.read(notificationsRepositoryProvider).markRead(item.id);
+    ref.invalidate(notificationsListProvider);
+  }
+  if (path != null && context.mounted) {
+    context.push(path);
   }
 }

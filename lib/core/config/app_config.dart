@@ -1,33 +1,14 @@
-import 'package:flutter/foundation.dart';
-
 class AppConfig {
   const AppConfig._();
 
   static const String _apiBaseUrlFromEnv = String.fromEnvironment('API_BASE_URL');
-  static const String devLanHost = String.fromEnvironment('DEV_LAN_HOST');
-  static const int apiPort = 8000;
-  static const String lanApiHost = '192.168.100.94';
 
-  /// Optional PC Wi-Fi IPv4 for a physical phone on the same network.
-  /// USB debugging does not need this: run `adb reverse tcp:8000 tcp:8000`.
-  static String get apiHost {
-    if (_apiBaseUrlFromEnv.isNotEmpty) {
-      return Uri.parse(_apiBaseUrlFromEnv).host;
-    }
-    if (devLanHost.isNotEmpty) return devLanHost;
-    if (kIsWeb) {
-      final host = Uri.base.host;
-      if (host == 'localhost' || host == '127.0.0.1') {
-        return '127.0.0.1';
-      }
-      if (host.isNotEmpty) return host;
-    }
-    return lanApiHost;
-  }
+  /// Local MoveX API. Override with `--dart-define=API_BASE_URL=...`.
+  static const String apiBaseUrlDefault = 'http://192.168.100.153:8000/api/v1';
 
   static String get apiBaseUrl {
     if (_apiBaseUrlFromEnv.isNotEmpty) return _apiBaseUrlFromEnv;
-    return 'http://$apiHost:$apiPort/api/v1';
+    return apiBaseUrlDefault;
   }
 
   static const String demoEmail = 'driver@omanhaulers.om';

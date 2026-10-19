@@ -18,6 +18,7 @@ class DriverApplication : Application() {
         super.onCreate()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
+        val manager = getSystemService(NotificationManager::class.java)
         val channel = NotificationChannel(
             TRACKING_CHANNEL_ID,
             getString(R.string.tracking_channel_name),
@@ -26,7 +27,14 @@ class DriverApplication : Application() {
             description = getString(R.string.tracking_channel_description)
             setShowBadge(false)
         }
-        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        manager.createNotificationChannel(channel)
+        manager.createNotificationChannel(
+            NotificationChannel(
+                "movex_alerts",
+                "MoveX",
+                NotificationManager.IMPORTANCE_HIGH,
+            ),
+        )
     }
 
     companion object {
